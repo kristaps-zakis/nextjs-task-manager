@@ -10,6 +10,9 @@ import { IoCloseSharp } from 'react-icons/io5';
 import PriorityDropDowns from '../drop-downs/priority-drop-downs';
 import { StatusDropDowns } from '../drop-downs/status-drop-down';
 import { DropdownViewColumns } from '../drop-downs/view-columns-drop-down';
+import { TasksTable } from './tasks-table';
+import { tasksColumns } from './tasks-columns';
+import { tasks } from '@/app/data/tasks-table';
 
 export default function TasksArea() {
   return (
@@ -32,7 +35,9 @@ export default function TasksArea() {
           </div>
         </div>
       </CardHeader>
-      <CardContent></CardContent>
+      <CardContent>
+        <TasksTable columns={tasksColumns} data={tasks} />
+      </CardContent>
       <CardFooter></CardFooter>
     </Card>
   );
