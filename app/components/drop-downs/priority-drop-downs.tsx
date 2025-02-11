@@ -56,7 +56,7 @@ export default function PriorityDropDowns() {
     null
   );
 
-  console.log(selectedStatus);
+  // console.log(selectedStatus);
 
   return (
     <div className="flex intems-center space-x-4">

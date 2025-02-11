@@ -72,7 +72,7 @@ export function StatusDropDowns() {
     null
   );
 
-  console.log(selectedStatus);
+  // console.log(selectedStatus);
 
   return (
     <div className="flex items-center space-x-4">
