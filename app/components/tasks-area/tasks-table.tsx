@@ -59,8 +59,6 @@ export function TasksTable<TData extends Task, TValue>({
     filterFns: { titleFilter, priorityFilter, statusFilter },
   });
 
-  console.log(columnFilters);
-
   useEffect(() => {
     const newFilters: ColumnFiltersState = [];
 

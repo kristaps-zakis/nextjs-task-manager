@@ -27,7 +27,8 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { useCheckedPrioritiesStore } from '@/app/hooks/useCheckedPrioritiesStore';
 
-import { Priority, tasks } from '@/app/data/tasks-table';
+import { Priority } from '@/app/data/tasks-table';
+import { useTasksDataStore } from '@/app/hooks/useTaskDataStore';
 
 type SinglePriorityItem = {
   value: string;
@@ -63,7 +64,7 @@ export default function PriorityDropDowns() {
   const { checkedPriorities, setCheckedPriorities } =
     useCheckedPrioritiesStore();
 
-  console.log(checkedPriorities);
+  const { tasks } = useTasksDataStore();
 
   // fucntion to update the array when a priority is checked
   function updateTheSelection(label: string) {

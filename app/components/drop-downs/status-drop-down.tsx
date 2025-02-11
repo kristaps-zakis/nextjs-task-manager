@@ -23,7 +23,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 
-import { Status, tasks } from '@/app/data/tasks-table';
+import { Status } from '@/app/data/tasks-table';
 import { useCheckedStatusesStore } from '@/app/hooks/useCheckedStatusStore';
 
 import {
@@ -34,6 +34,7 @@ import {
   LucideIcon,
   XCircle,
 } from 'lucide-react';
+import { useTasksDataStore } from '@/app/hooks/useTaskDataStore';
 
 type SingleStatusItem = {
   value: string;
@@ -85,6 +86,8 @@ export function StatusDropDowns() {
   const [open, setOpen] = React.useState(false);
 
   const { checkedStatuses, setCheckedStatuses } = useCheckedStatusesStore();
+
+  const { tasks } = useTasksDataStore();
 
   function updateTheCheckedStatus(label: string) {
     const validStatuses: Status[] = [

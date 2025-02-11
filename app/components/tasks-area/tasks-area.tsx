@@ -12,15 +12,20 @@ import { StatusDropDowns } from '../drop-downs/status-drop-down';
 import { DropdownViewColumns } from '../drop-downs/view-columns-drop-down';
 import { TasksTable } from './tasks-table';
 import { tasksColumns } from './tasks-columns';
-import { tasks } from '@/app/data/tasks-table';
+// import { tasks } from '@/app/data/tasks-table';
 import PaginationArea from './pagination/pagination-area';
 import { useCheckedPrioritiesStore } from '@/app/hooks/useCheckedPrioritiesStore';
 import { useCheckedStatusesStore } from '@/app/hooks/useCheckedStatusStore';
+
+import { useTasksDataStore } from '@/app/hooks/useTaskDataStore';
+import TableSkeleton from './TableSkeleton';
 
 export default function TasksArea() {
   const { setCheckedPriorities, checkedPriorities } =
     useCheckedPrioritiesStore();
   const { setCheckedStatuses, checkedStatuses } = useCheckedStatusesStore();
+
+  const { tasks } = useTasksDataStore();
 
   return (
     <Card>
@@ -51,7 +56,14 @@ export default function TasksArea() {
         </div>
       </CardHeader>
       <CardContent>
-        <TasksTable columns={tasksColumns} data={tasks} />
+        {!tasks ? (
+          <>
+            <h1>Woot</h1>
+            <TableSkeleton />
+          </>
+        ) : (
+          <TasksTable columns={tasksColumns} data={tasks} />
+        )}
       </CardContent>
       <CardFooter>
         <PaginationArea />
