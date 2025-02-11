@@ -7,6 +7,8 @@ export type Label =
 export type Status = 'Backlog' | 'Todo' | 'In Progress' | 'Done' | 'Canceled';
 export type Priority = 'Low' | 'Medium' | 'High';
 
+// export type Single
+
 export type Task = {
   taskId: string;
   title: string;

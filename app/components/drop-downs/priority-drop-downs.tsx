@@ -25,38 +25,94 @@ import { IconType } from 'react-icons/lib';
 
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
+import { useCheckedPrioritiesStore } from '@/app/hooks/useCheckedPrioritiesStore';
 
-type Status = {
+import { Priority, tasks } from '@/app/data/tasks-table';
+
+type SinglePriorityItem = {
   value: string;
   label: string;
   icon: IconType;
+  count: number;
 };
 
-const statuses: Status[] = [
+const prioritiesArray: SinglePriorityItem[] = [
   {
     value: 'high',
     label: 'High',
     icon: IoMdArrowUp,
+    count: 0,
   },
   {
     value: 'medium',
     label: 'Medium',
     icon: IoArrowBack,
+    count: 0,
   },
   {
     value: 'low',
     label: 'Low',
     icon: IoArrowDown,
+    count: 0,
   },
 ];
 
 export default function PriorityDropDowns() {
   const [open, setOpen] = React.useState(false);
-  const [selectedStatus, setSelectedStatus] = React.useState<Status | null>(
-    null
-  );
 
-  // console.log(selectedStatus);
+  const { checkedPriorities, setCheckedPriorities } =
+    useCheckedPrioritiesStore();
+
+  console.log(checkedPriorities);
+
+  // fucntion to update the array when a priority is checked
+  function updateTheSelection(label: string) {
+    // this code will safely take the value from string to priority type
+    // to safely cast it down below, and avoid using a type that is not defined
+
+    // valid priorities
+    const validPriorities: Priority[] = ['Low', 'Medium', 'High'];
+
+    if (!validPriorities.includes(label as Priority)) {
+      console.error('Invalid priority');
+      return;
+    }
+
+    const castedPriority = label as Priority;
+
+    const newCheckedPriorities = checkedPriorities.includes(castedPriority)
+      ? checkedPriorities.filter((p) => p !== castedPriority)
+      : [...checkedPriorities, castedPriority];
+
+    setCheckedPriorities(newCheckedPriorities);
+  }
+
+  // this useMemo hook is going to execute every time the tasks is updated
+  const priorityCount: SinglePriorityItem[] = React.useMemo(() => {
+    // if the tasks is null, return statusesArray
+    if (!tasks) return prioritiesArray;
+
+    const countByLow = tasks?.filter((task) => task.priority === 'Low').length;
+    const countByMedium = tasks?.filter(
+      (task) => task.priority === 'Medium'
+    ).length;
+    const countByHigh = tasks?.filter(
+      (task) => task.priority === 'High'
+    ).length;
+
+    return prioritiesArray.map((priority) => {
+      switch (priority.value) {
+        case 'low':
+          return { ...priority, count: countByLow };
+        case 'medium':
+          return { ...priority, count: countByMedium };
+        case 'high':
+          return { ...priority, count: countByHigh };
+        default:
+          return priority;
+      }
+    });
+  }, [tasks]);
 
   return (
     <div className="flex intems-center space-x-4">
@@ -74,17 +130,24 @@ export default function PriorityDropDowns() {
                 <span>Priority</span>
               </div>
 
-              {/* Seperator */}
-              <Separator
-                orientation="vertical"
-                className="h-6 border-1 border-gray-300"
-              />
+              {checkedPriorities?.length > 0 && (
+                <>
+                  {/* Seperator */}
+                  <Separator
+                    orientation="vertical"
+                    className="h-6 border-1 border-gray-300"
+                  />
 
-              {/* Badges */}
-              <div className="flex items-center gap-2">
-                <Badge variant={'secondary'}>Low</Badge>
-                <Badge variant={'secondary'}>Medium</Badge>
-              </div>
+                  {/* Badges */}
+                  <div className="flex items-center gap-2">
+                    {checkedPriorities.map((checkedPriority, index) => (
+                      <Badge key={index} variant={'secondary'}>
+                        {checkedPriority}
+                      </Badge>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           </Button>
         </PopoverTrigger>
@@ -104,24 +167,23 @@ export default function PriorityDropDowns() {
             <CommandList>
               <CommandEmpty>No results found.</CommandEmpty>
               <CommandGroup>
-                {statuses.map((status) => (
+                {priorityCount.map((priority) => (
                   <CommandItem
-                    key={status.value}
-                    value={status.value}
+                    key={priority.value}
+                    value={priority.value}
                     className="flex justify-between"
-                    onSelect={(value) => {
-                      setSelectedStatus(
-                        statuses.find((priority) => priority.value === value) ||
-                          null
-                      );
-                    }}
+                    onSelect={() => updateTheSelection(priority.label)}
                   >
                     <div className="flex items-center gap-3">
-                      <Checkbox />
-                      <status.icon />
-                      <span>{status.label}</span>
+                      <Checkbox
+                        checked={checkedPriorities.includes(
+                          priority.label as Priority
+                        )}
+                      />
+                      <priority.icon />
+                      <span>{priority.label}</span>
                     </div>
-                    <span>23</span>
+                    <span>{priority.count}</span>
                   </CommandItem>
                 ))}
               </CommandGroup>

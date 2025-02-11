@@ -14,8 +14,14 @@ import { TasksTable } from './tasks-table';
 import { tasksColumns } from './tasks-columns';
 import { tasks } from '@/app/data/tasks-table';
 import PaginationArea from './pagination/pagination-area';
+import { useCheckedPrioritiesStore } from '@/app/hooks/useCheckedPrioritiesStore';
+import { useCheckedStatusesStore } from '@/app/hooks/useCheckedStatusStore';
 
 export default function TasksArea() {
+  const { setCheckedPriorities, checkedPriorities } =
+    useCheckedPrioritiesStore();
+  const { setCheckedStatuses, checkedStatuses } = useCheckedStatusesStore();
+
   return (
     <Card>
       <CardHeader>
@@ -26,11 +32,19 @@ export default function TasksArea() {
             <StatusDropDowns />
 
             <PriorityDropDowns />
-
-            <Button variant={'ghost'} className="h-10">
-              <span>Reset</span>
-              <IoCloseSharp />
-            </Button>
+            {(checkedPriorities.length > 0 || checkedStatuses.length > 0) && (
+              <Button
+                variant={'ghost'}
+                className="h-10"
+                onClick={() => {
+                  setCheckedPriorities([]);
+                  setCheckedStatuses([]);
+                }}
+              >
+                <span>Reset</span>
+                <IoCloseSharp />
+              </Button>
+            )}
 
             <DropdownViewColumns />
           </div>
