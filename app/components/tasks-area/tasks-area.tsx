@@ -13,6 +13,7 @@ import { DropdownViewColumns } from '../drop-downs/view-columns-drop-down';
 import { TasksTable } from './tasks-table';
 import { tasksColumns } from './tasks-columns';
 import { tasks } from '@/app/data/tasks-table';
+import PaginationArea from './pagination/pagination-area';
 
 export default function TasksArea() {
   return (
@@ -38,7 +39,9 @@ export default function TasksArea() {
       <CardContent>
         <TasksTable columns={tasksColumns} data={tasks} />
       </CardContent>
-      <CardFooter></CardFooter>
+      <CardFooter>
+        <PaginationArea />
+      </CardFooter>
     </Card>
   );
 }
