@@ -7,6 +7,10 @@ export interface useTasksDataStoreInterface {
   setSelectedTask: (task: Task | null) => void;
   setTasks: (tasks: Task[]) => void;
   fetchTasks: () => Promise<void>;
+  updateTasks: (
+    tasks: Task[],
+    operation?: string | undefined
+  ) => Promise<{ success: boolean; message: string }>;
 }
 
 export const useTasksDataStore = create<useTasksDataStoreInterface>((set) => ({
@@ -34,6 +38,48 @@ export const useTasksDataStore = create<useTasksDataStoreInterface>((set) => ({
     } catch (err) {
       console.log('Failed to fetch tasks', err);
       set({ tasks: null });
+    }
+  },
+  updateTasks: async (
+    updateTasksArray: Task[],
+    operation: string | undefined
+  ) => {
+    let successMessage = '';
+
+    switch (operation) {
+      case 'copy':
+        successMessage = 'Task has been coppied successfully!';
+        break;
+      case 'delete':
+        successMessage = 'Task has been deleted successfully!';
+        break;
+      case 'favorite':
+        successMessage = 'Task is set as favorite successfully!';
+        break;
+      default:
+        successMessage = 'Operation completed successfully';
+        break;
+    }
+
+    try {
+      const result = await new Promise<{ success: boolean; message: string }>(
+        (resolve) => {
+          setTimeout(() => {
+            set({ tasks: updateTasksArray });
+
+            resolve({
+              success: true,
+              message: successMessage,
+            });
+          }, 1234);
+        }
+      );
+
+      return result;
+    } catch (error: unknown) {
+      console.log(error);
+
+      return { success: false, message: 'Something went wrong!' };
     }
   },
 }));

@@ -11,13 +11,22 @@ import {
 import { LABEL_OPTIONS } from './constants';
 import { Tag } from 'lucide-react';
 
+interface LabelSubMenuProps {
+  value: string;
+  onValueChange: (value: string) => void;
+  onClickedLabelItem: (value: string) => void;
+}
+
 export function LabelSubMenu({
   value,
   onValueChange,
-}: {
-  value: string;
-  onValueChange: (value: string) => void;
-}) {
+  onClickedLabelItem,
+}: LabelSubMenuProps) {
+  const handleValueChange = (newValue: string) => {
+    onValueChange(newValue);
+    onClickedLabelItem(newValue);
+  };
+
   return (
     <DropdownMenuSub>
       <DropdownMenuSubTrigger>
@@ -27,12 +36,12 @@ export function LabelSubMenu({
 
       <DropdownMenuPortal>
         <DropdownMenuSubContent className="poppins">
-          <DropdownMenuRadioGroup value={value} onValueChange={onValueChange}>
+          <DropdownMenuRadioGroup
+            value={value}
+            onValueChange={handleValueChange}
+          >
             {LABEL_OPTIONS.map((option) => (
-              <DropdownMenuRadioItem
-                key={option}
-                value={option.toLocaleLowerCase()}
-              >
+              <DropdownMenuRadioItem key={option} value={option}>
                 {option}
               </DropdownMenuRadioItem>
             ))}

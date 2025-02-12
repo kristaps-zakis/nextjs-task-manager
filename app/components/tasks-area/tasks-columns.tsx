@@ -28,6 +28,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@radix-ui/react-dropdown-menu';
+import { useTasksDataStore } from '@/app/hooks/useTaskDataStore';
+import { TaskDropDown } from '../drop-downs/task-drop-down/task-drop-down';
 
 function renderStatusIcons(status: Status) {
   switch (status) {
@@ -76,11 +78,6 @@ function formatDate(date: Date) {
       : 'th';
 
   return `${day}${suffix} ${month} ${year}`;
-  //   return new Intl.DateTimeFormat('en-US', {
-  //     day: 'numeric',
-  //     month: 'short',
-  //     year: 'numeric',
-  //   }).format(date);
 }
 
 type SortableHeaderProps = {
@@ -99,7 +96,7 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({ column, label }) => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="" asChild>
+      <DropdownMenuTrigger asChild>
         <div
           className={`flex items-start py-[14px] select-none cursor-pointer p-2 gap-1 ${
             isSorted && 'text-primary'
@@ -110,6 +107,7 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({ column, label }) => {
           <SortingIcon className="w-4 h-4" />
         </div>
       </DropdownMenuTrigger>
+
       <DropdownMenuContent
         align="start"
         side="bottom"
@@ -119,20 +117,25 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({ column, label }) => {
           <IoMdArrowUp className="mr-2 w-4 h-4" />
           ASC
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <IoMdArrowDown
-            onClick={() => column.toggleSorting(false)}
-            className="mr-2 w-4 h-4"
-          />
+        <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
+          <IoMdArrowDown className="mr-2 w-4 h-4" />
           DESC
         </DropdownMenuItem>
+        {label !== 'Title' && (
+          <>
+            <DropdownMenuSeparator />
 
-        <DropdownMenuSeparator />
-
-        <DropdownMenuItem>
-          <GrHide className="mr-2 size-7 text-p[acity-90" />
-          Hide
-        </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                column.toggleVisibility();
+              }}
+            >
+              <GrHide className="mr-2 size-7 text-p[acity-90" />
+              Hide
+            </DropdownMenuItem>
+          </>
+        )}
+        ;
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -236,5 +239,19 @@ export const tasksColumns: ColumnDef<Task>[] = [
   },
   {
     id: 'actions',
+    cell: ({ row }) => {
+      return <ShowTaskDropDown task={row.original} />;
+    },
   },
 ];
+
+function ShowTaskDropDown({ task }: { task: Task }) {
+  const { setSelectedTask } = useTasksDataStore();
+
+  return (
+    <TaskDropDown
+      onOpen={() => setSelectedTask(task)}
+      onClose={() => setSelectedTask(null)}
+    />
+  );
+}

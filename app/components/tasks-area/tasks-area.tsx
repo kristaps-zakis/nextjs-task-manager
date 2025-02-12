@@ -19,6 +19,18 @@ import { useCheckedStatusesStore } from '@/app/hooks/useCheckedStatusStore';
 
 import { useTasksDataStore } from '@/app/hooks/useTaskDataStore';
 import TableSkeleton from './TableSkeleton';
+import { useQueryStore } from '@/app/hooks/useQueryStore';
+import {
+  ColumnFiltersState,
+  getCoreRowModel,
+  getFilteredRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
+import { statusFilter } from './filters/statusFilters';
+import { titleFilter } from './filters/titleFilter';
+import { priorityFilter } from './filters/priorityFilters';
+
+import { useState, useEffect } from 'react';
 
 export default function TasksArea() {
   const { setCheckedPriorities, checkedPriorities } =
@@ -26,6 +38,38 @@ export default function TasksArea() {
   const { setCheckedStatuses, checkedStatuses } = useCheckedStatusesStore();
 
   const { tasks } = useTasksDataStore();
+  const { query } = useQueryStore();
+
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const table = useReactTable({
+    data: tasks || [],
+    columns: tasksColumns,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnFiltersChange: setColumnFilters,
+    state: {
+      columnFilters,
+    },
+    filterFns: { titleFilter, priorityFilter, statusFilter },
+  });
+
+  useEffect(() => {
+    const newFilters: ColumnFiltersState = [];
+
+    if (query) {
+      newFilters.push({ id: 'title', value: query });
+    }
+
+    if (checkedPriorities.length > 0) {
+      newFilters.push({ id: 'priority', value: checkedPriorities });
+    }
+
+    if (checkedStatuses.length > 0) {
+      newFilters.push({ id: 'status', value: checkedStatuses });
+    }
+
+    setColumnFilters(newFilters);
+  }, [query, checkedPriorities, checkedStatuses]);
 
   return (
     <Card>
@@ -37,6 +81,7 @@ export default function TasksArea() {
             <StatusDropDowns />
 
             <PriorityDropDowns />
+
             {(checkedPriorities.length > 0 || checkedStatuses.length > 0) && (
               <Button
                 variant={'ghost'}
@@ -51,18 +96,17 @@ export default function TasksArea() {
               </Button>
             )}
 
-            <DropdownViewColumns />
+            <DropdownViewColumns table={table} />
           </div>
         </div>
       </CardHeader>
       <CardContent>
         {!tasks ? (
           <>
-            <h1>Woot</h1>
             <TableSkeleton />
           </>
         ) : (
-          <TasksTable columns={tasksColumns} data={tasks} />
+          <TasksTable table={table} columns={tasksColumns} />
         )}
       </CardContent>
       <CardFooter>
