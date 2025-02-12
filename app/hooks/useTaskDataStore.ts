@@ -11,6 +11,7 @@ export interface useTasksDataStoreInterface {
     tasks: Task[],
     operation?: string | undefined
   ) => Promise<{ success: boolean; message: string }>;
+  addTask: (task: Task) => Promise<{ success: boolean; message: string }>;
 }
 
 export const useTasksDataStore = create<useTasksDataStoreInterface>((set) => ({
@@ -33,7 +34,7 @@ export const useTasksDataStore = create<useTasksDataStoreInterface>((set) => ({
         setTimeout(() => {
           set({ tasks });
           resolve();
-        }, 1000);
+        }, 1);
       });
     } catch (err) {
       console.log('Failed to fetch tasks', err);
@@ -71,7 +72,7 @@ export const useTasksDataStore = create<useTasksDataStoreInterface>((set) => ({
               success: true,
               message: successMessage,
             });
-          }, 1234);
+          }, 1);
         }
       );
 
@@ -80,6 +81,27 @@ export const useTasksDataStore = create<useTasksDataStoreInterface>((set) => ({
       console.log(error);
 
       return { success: false, message: 'Something went wrong!' };
+    }
+  },
+  addTask: async (task: Task) => {
+    try {
+      const result = await new Promise<{ success: boolean; message: string }>(
+        (resolve) => {
+          set((state) => {
+            const updatedTasks = state.tasks ? [...state.tasks, task] : [task];
+            return { tasks: updatedTasks };
+          });
+          resolve({
+            success: true,
+            message: 'Task succesfully added!',
+          });
+        }
+      );
+
+      return result;
+    } catch (error: unknown) {
+      console.log(error);
+      return { success: false, message: 'Failed to add task!' };
     }
   },
 }));
